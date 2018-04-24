@@ -1,0 +1,98 @@
+
+.game-container {
+    position: absolute;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.board {
+    margin-top: 40px;
+    position: absolute;
+    padding: 15px;
+    cursor: default;
+    background: #bbada0;
+    border-radius: 6px;
+    width: 500px;
+    height: 500px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box; 
+  
+}
+.board-row {
+    margin-bottom: 15px;
+    position: relative;
+}
+.board-row:last-child {
+    margin-bottom: 0px;
+}
+.board-row:after {
+    content: "";
+    display: block;
+    clear: both; }
+
+.board-cell {
+    margin-right: 15px;
+    position: relative;
+    border-radius: 3px;
+    background: #d4cac0;
+    width: 106.25px;
+    height: 106.25px;
+    float: left;
+}
+.board-cell:last-child {
+    margin-right: 0px;
+}
+
+.tiles {
+    margin-top: 40px;
+    position: absolute;
+    padding: 15px;
+    cursor: default;
+    border-radius: 6px;
+    width: 500px;
+    height: 500px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box; 
+    z-index: 2;  
+}
+
+.tile {
+    position: absolute;
+    border-radius: 3px;
+    background: #eeeeee;
+    width: 106.25px;
+    height: 106.25px;
+    float: left;
+    transition: margin 200ms;
+
+    text-align: center;
+    font-weight: bold;
+    font-size: 55px;
+    align-self: center;
+}
+
+.tile-row0 {
+    margin-top: 0px;
+}
+.tile-row1 {
+    margin-top: 121.25px;
+}
+.tile-row2 {
+    margin-top: 242.5px;
+}
+.tile-row3 {
+    margin-top: 363.75px;
+}
+.tile-col0 {
+    margin-left: 0px;
+}
+.tile-col1 {
+    margin-left: 121.25px;
+}
+.tile-col2 {
+    margin-left: 242.5px;
+}
+.tile-col3 {
+    margin-left: 363.75px;
+}
