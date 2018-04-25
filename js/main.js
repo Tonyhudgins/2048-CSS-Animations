@@ -64,7 +64,7 @@
         },
 
         collapse: function (direction) { //U,D,L,R
-            tiles.innerHTML = tileData.serialize();
+//            tiles.innerHTML = tileData.serialize();
 
             const changeTileCol = function (t, from, to) {
                 t.classList.remove(`tile-col${from}`)
@@ -73,10 +73,14 @@
     
             setTimeout(()=>{
                 let tileDisplayArray = tiles.getElementsByClassName("tile");
-                let newTilePos = -1;
+                let current = -1,
+                    previous = -1,
+                    newTilePos = -1,               //newTilePos set each row - blank tile
+                    newMergePos = -1;              //newMergePos is ...
                 let ta = this.tileArray;
                 let merged = false;
                 let moved = false;
+                let dir;
 
                 switch (direction) {
                     case "U":
@@ -87,38 +91,45 @@
 
                     case "L":
                     console.log("LEFT")
+                    dir = 1;
                     let i = 0;
                     for (let row=0; row<4; row++) {
                         newTilePos = -1;
                         merged = false;
                         for (let col=0; col<4; col++) {
+                            current = row*4+col
+                            previous = current - dir
+                            //newTilePos set each row
+                            newMergePos = newTilePos - dir
+
+
                             console.log("col:",col, ", merged:",merged)
-                            if (ta[row*4+col] === 0) {             //If unpopulated cell
-                                if (newTilePos === -1) newTilePos = row*4+col
+                            if (ta[current] === 0) {                          //If unpopulated cell
+                                if (newTilePos === -1) newTilePos = current
 
                                 console.log("blank cell",newTilePos)
                             }else{                                              //If populated cell
-                                if (col === 0) {                                //do nothing
+                                if (col === 0) {                                //If first cell do nothing
                                     i++
                                     console.log("first cell")
                                 
-                                }else if ( !merged && ta[row*4+col] === ta[row*4+col-1] ) {  //2 matching next to each other
+                                }else if ( !merged && ta[current] === ta[previous] ) {  //2 matching next to each other
                                     changeTileCol(tileDisplayArray[i], col, col-1)
                                     i++
-                                    ta[row*4+col-1] *= 2
-                                    ta[row*4+col] = 0
-                                    newTilePos = row*4+col;
+                                    ta[previous] *= 2
+                                    ta[current] = 0
+                                    newTilePos = current;
                                     console.log("merge_cell", newTilePos)
                                     merged = true;
                                     moved = true;
 
-                                }else if (!merged && ta[row*4+col-1] === 0 && (ta[row*4+col] === ta[newTilePos-1]) ) {  //If blank cell before
+                                }else if (!merged && ta[previous] === 0 && (ta[current] === ta[newTilePos-1]) ) {  //If blank cell before
                                     changeTileCol(tileDisplayArray[i], col, newTilePos%4-1)
                                     console.log(`tile-col${newTilePos%4-1} merged`)
                                     i++
                                     ta[newTilePos-1] *= 2
                                     console.log(`ta[newTilePos-1]`, newTilePos, newTilePos-1, ta[newTilePos-1])
-                                    ta[row*4+col] = 0
+                                    ta[current] = 0
                                     // newTilePos stays the same
                                     console.log("merge_cell_2", newTilePos)
                                     merged = true;
@@ -129,8 +140,8 @@
                                     console.log("i", i)
                                     changeTileCol(tileDisplayArray[i], col, newTilePos%4)
                                     i++
-                                    ta[newTilePos] = ta[row*4+col]
-                                    ta[row*4+col] = 0
+                                    ta[newTilePos] = ta[current]
+                                    ta[current] = 0
                                     newTilePos++;
                                     moved = true;
                                     merged = false;
@@ -158,11 +169,11 @@
 
                 if (moved) {
                     this.logTable();
-                    setTimeout(()=>{tiles.innerHTML = this.serialize()}, 1000)
-                    setTimeout(()=>this.addTile(), 2000);    
+                    setTimeout(()=>{tiles.innerHTML = this.serialize()}, 300)
+                    setTimeout(()=>this.addTile(), 700);    
                 }
 
-            },1100) //delay to allow the DOM to render
+            },200) //delay to allow the DOM to render
         }
     } 
 
