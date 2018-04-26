@@ -8,6 +8,13 @@
     const tileData = {
 
         tileArray: [
+            0,0,0,0,
+            0,0,0,0,
+            0,0,0,0,
+            0,0,0,0
+        ],
+/*
+        tileArray: [
             0,0,2,0,
             2,0,2,0,
             4,0,0,4,
@@ -20,7 +27,7 @@
             0,0,0,0,
             8,0,0,0
         ],
-
+*/
         divIndex: [],
 
         logTable: function () {
@@ -55,8 +62,8 @@
                 e.appendChild(document.createTextNode(this.tileArray[j].toString()))
     
                 tiles.appendChild(e)
-               }
-               setTimeout(()=>{tiles.innerHTML=this.serialize();this.logTable()},500)
+            }
+            setTimeout(()=>{tiles.innerHTML=this.serialize();this.logTable()},500)
         },
 
         serialize: function () {
@@ -76,7 +83,12 @@
                 t.classList.remove(`tile-col${from}`)
                 t.classList.add(`tile-col${to}`)
             }
-    
+
+            const changeTileRow = function (t, from, to) {
+                t.classList.remove(`tile-row${from}`)
+                t.classList.add(`tile-row${to}`)
+            }
+
             setTimeout(()=>{
                 let tileDisplayArray = tiles.getElementsByClassName("tile");
                 let n=-1;
@@ -107,17 +119,16 @@
                     newMergePos = newTilePos - dir
 
                     console.log("col:",col, ", merged:",merged)
-                    if (ta[current] === 0) {                          //If unpopulated cell
+                    if (ta[current] === 0) {                            //If unpopulated cell
                         if (newTilePos === -1) newTilePos = current
                         console.log("blank cell",newTilePos)
 
                     }else{                                              //If populated cell
                         console.log("dir", dir, ", col", col)
-//                        console.log((dir===1)?0:3)
-                        if (col === ((dir===1)?0:3)) {                                //If first cell do nothing
+                        if (col === ((dir===1)?0:3)) {                           //If first cell do nothing
                             console.log("first cell")
                         
-                        }else if ( !merged && ta[current] === ta[previous] ) {  //2 matching next to each other
+                        }else if ( !merged && ta[current] === ta[previous] ) {   //If 2 matching tiles ajacent
                             changeTileCol(this.divIndex[current], col, col-dir)
                             ta[previous] *= 2
                             ta[current] = 0
@@ -128,9 +139,7 @@
 
                         }else if (!merged && ta[previous] === 0 && (ta[current] === ta[newTilePos-dir]) ) {  //If blank cell before
                             changeTileCol(this.divIndex[current], col, newTilePos%4-dir)
-                //                                    console.log(`tile-col${newTilePos%4-dir} merged`)
                             ta[newTilePos-dir] *= 2
-                //                                    console.log(`ta[newTilePos-1]`, newTilePos, newTilePos-dir, ta[newTilePos-dir])
                             ta[current] = 0
                             // newTilePos stays the same
                             console.log("merge_cell_2", newTilePos)
@@ -152,11 +161,78 @@
                     }
                 }
 
+                collapseCol = (col, row) => {
+                    current = row*4+col
+                    previous = current - dir
+                    //newTilePos set each row
+                    newMergePos = newTilePos - dir
+
+                    console.log("row:",row, ", merged:",merged)
+                    if (ta[current] === 0) {                            //If unpopulated cell
+                        if (newTilePos === -1) newTilePos = current
+                        console.log("blank cell",newTilePos)
+
+                    }else{                                              //If populated cell
+                        console.log("dir", dir, ", row", row)
+                        if (row === ((dir>0)?0:3)) {                           //If first cell do nothing
+                            console.log("first cell")
+                        
+                        }else if ( !merged && ta[current] === ta[previous] ) {   //If 2 matching tiles ajacent
+                            changeTileRow(this.divIndex[current], row, row-dir/4)
+                            ta[previous] *= 2
+                            ta[current] = 0
+                            newTilePos = current;
+                            console.log("merge_cell", newTilePos)
+                            merged = true;
+                            moved = true;
+
+                        }else if (!merged && ta[previous] === 0 && (ta[current] === ta[newTilePos-dir]) ) {  //If blank cell before
+                            changeTileRow(this.divIndex[current], row, Math.floor((newTilePos-dir)/4))
+                            ta[newTilePos-dir] *= 2
+                            ta[current] = 0
+                            // newTilePos stays the same
+                            console.log("merge_cell_2", newTilePos)
+                            merged = true;
+                            moved = true;
+
+                        }else if (newTilePos > -1) {                    //If blank cell before
+                            console.log("move cell", newTilePos)
+                            changeTileRow(this.divIndex[current], row, Math.floor((newTilePos)/4))
+                            ta[newTilePos] = ta[current]
+                            ta[current] = 0
+                            newTilePos = newTilePos + dir;
+                            moved = true;
+                            merged = false;
+
+                        }else{                                          //no move to make
+                            console.log("skip",newTilePos)
+                        }                                                       
+                    }
+                }
+
                 switch (direction) {
                     case "U":
+                    console.log("UP")
+                    dir = 4;
+                    for (let col=0; col<4; col++) {
+                        newTilePos = -1;
+                        merged = false;
+                        for (let row=0; row<4; row++) {
+                            collapseCol(col, row)
+                        }
+                    }
                     break;
 
                     case "D":
+                    console.log("DOWN")
+                    dir = -4;
+                    for (let col=3; col>=0; col--) {
+                        newTilePos = -1;
+                        merged = false;
+                        for (let row=3; row>=0; row--) {
+                            collapseCol(col, row)
+                        }
+                    }
                     break;
 
                     case "L":
@@ -194,7 +270,9 @@
         }
     } 
 
-
+    tileData.addTile()
+    tileData.addTile()
+    
     tiles.innerHTML = tileData.serialize();
 
 //}());
