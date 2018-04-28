@@ -1,9 +1,85 @@
+const PRESSED = 1;
+const RELEASED = 0;
+
+class Keyboard {
+    constructor() {
+        // Holds the current state of a given key
+        this.keyStates = new Map();
+
+        // Holds the callback functions for a key code
+        this.keyMap = new Map();
+    }
+
+    addMapping(keyCode, callback) {
+        this.keyMap.set(keyCode, callback);
+    }
+
+    handleEvent(event) {
+        const {keyCode} = event;
+
+        if (!this.keyMap.has(keyCode)) {
+            // Did not have key mapped.
+            return false;
+        }
+
+        event.preventDefault();
+
+        const keyState = (event.type === 'keydown') ? PRESSED : RELEASED;
+
+        if (this.keyStates.get(keyCode) === keyState) {
+            // Already pressed. Blocks key repeating.
+            return;
+        }
+
+        this.keyStates.set(keyCode, keyState);
+
+        this.keyMap.get(keyCode)(keyState);
+    }
+
+    listenTo(window) {
+        ['keydown', 'keyup'].forEach(eventName => {
+            window.addEventListener(eventName, event => {
+                this.handleEvent(event);
+            });    
+        });
+    }
+}    
+
+
+
+
 //(function () {
+    const SPACE = 32;
+    const UP    = 38;
+    const DOWN  = 40;
+    const LEFT  = 37;
+    const RIGHT = 39;
+    const input = new Keyboard();
+
     let tiles = document.getElementsByClassName("tiles")[0];
 
-    const keyHandler = {
-        ready: true
-    }
+    input.addMapping(SPACE, keyState => {
+        console.log("keyState", keyState);
+        if (keyState) {
+            console.log("SPACE")//mario.jump.start();
+        } else {
+            console.log("UNSPACE")
+        }
+    });
+
+    [UP, DOWN, LEFT, RIGHT].forEach(keyName => {
+        input.addMapping(keyName, keyState => {
+            console.log("keyState", keyState);
+            if (keyState) {
+                console.log(keyName)
+                tileData.collapse(keyName);
+            } else {
+                console.log("UNLEFT")
+                //mario.jump.cancel();
+            }
+        });    
+    })
+    input.listenTo(window);
 
     const tileData = {
 
@@ -13,21 +89,7 @@
             0,0,0,0,
             0,0,0,0
         ],
-/*
-        tileArray: [
-            0,0,2,0,
-            2,0,2,0,
-            4,0,0,4,
-            8,8,16,0
-        ],
 
-        tileArray: [
-            0,0,0,0,
-            0,0,2,0,
-            0,0,0,0,
-            8,0,0,0
-        ],
-*/
         divIndex: [],
 
         logTable: function () {
@@ -56,7 +118,7 @@
                 this.tileArray[j] = Math.random() > .5 ? 2 : 4;
                 let e = document.createElement("DIV")
                 let att = document.createAttribute("class");       // Create a "class" attribute
-                let attValue = `tile tile-row${Math.floor(j/4)} tile-col${j%4}`;                           // Set the value of the class attribute
+                let attValue = `tile tile-${this.tileArray[j].toString()} tile-${this.tileArray[j].toString()} tile-row${Math.floor(j/4)} tile-col${j%4}`;                           // Set the value of the class attribute
                 att.value = attValue;
                 e.setAttributeNode(att); 
                 e.appendChild(document.createTextNode(this.tileArray[j].toString()))
@@ -68,7 +130,7 @@
 
         serialize: function () {
             let res = this.tileArray.reduce((acc, c, index) => {
-                    return acc.concat((c>0)? `<div class="tile 
+                    return acc.concat((c>0)? `<div class="tile tile-${c.toString()} 
                             tile-row${Math.floor(index/4)} 
                             tile-col${index%4}">${c}</div>` 
                             : ``);
@@ -77,8 +139,6 @@
         },
 
         collapse: function (direction) { //U,D,L,R
-//            tiles.innerHTML = tileData.serialize();
-
             const changeTileCol = function (t, from, to) {
                 t.classList.remove(`tile-col${from}`)
                 t.classList.add(`tile-col${to}`)
@@ -102,7 +162,7 @@
                     }
                     return res
                 })
-//                console.log("divIndex", this.divIndex)
+
                 let current = -1,
                     previous = -1,
                     newTilePos = -1,               //newTilePos set each row - blank tile
@@ -211,7 +271,7 @@
                 }
 
                 switch (direction) {
-                    case "U":
+                    case UP:
                     console.log("UP")
                     dir = 4;
                     for (let col=0; col<4; col++) {
@@ -223,7 +283,7 @@
                     }
                     break;
 
-                    case "D":
+                    case DOWN:
                     console.log("DOWN")
                     dir = -4;
                     for (let col=3; col>=0; col--) {
@@ -235,7 +295,7 @@
                     }
                     break;
 
-                    case "L":
+                    case LEFT:
                     console.log("LEFT")
                     dir = 1;
                     for (let row=0; row<4; row++) {
@@ -247,7 +307,7 @@
                     }
                     break;
 
-                    case "R":
+                    case RIGHT:
                     console.log("RIGHT")
                     dir = -1;
                     for (let row=3; row>=0; row--) {
