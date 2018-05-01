@@ -1,6 +1,8 @@
 
 .game-container {
     position: absolute;
+    width: 500px;
+    height: 40px;
     font-family: Arial, Helvetica, sans-serif;
     -webkit-touch-callout: none;
     -ms-touch-callout: none;
