@@ -45,7 +45,100 @@ class Keyboard {
     }
 }    
 
+class Scoreboard {
+    constructor() {
+        this.score = 0;
+    }
 
+    mapDisplay (scoreDiv, hiScoreDiv) {
+        this.scoreDisplay = scoreDiv;
+        this.hiScoreDisplay = hiScoreDiv;
+    }
+
+    setScore (val) {
+        console.log("setScore", val)
+        this.score += val;
+        this.scoreDisplay.innerHTML = this.score.toString();
+    }
+
+    setHiScore (val) {
+        console.log("setHiScore", val)
+        this.hiScoreDisplay.innerHTML = val.toString();
+    }    
+}
+
+class Swipe {
+    constructor(element) {
+        this.xDown = null;
+        this.yDown = null;
+        this.element = element;
+
+        this.element.addEventListener('touchstart', function(evt) {
+            this.xDown = evt.touches[0].clientX;
+            this.yDown = evt.touches[0].clientY;
+        }.bind(this), false);
+    }
+
+    onLeft(callback) {
+        this.onLeft = callback;
+
+        return this;
+    }
+
+    onRight(callback) {
+        this.onRight = callback;
+
+        return this;
+    }
+
+    onUp(callback) {
+        this.onUp = callback;
+
+        return this;
+    }
+
+    onDown(callback) {
+        this.onDown = callback;
+
+        return this;
+    }
+
+    handleTouchMove(evt) {
+        if ( ! this.xDown || ! this.yDown ) {
+            return;
+        }
+
+        var xUp = evt.touches[0].clientX;
+        var yUp = evt.touches[0].clientY;
+
+        this.xDiff = this.xDown - xUp;
+        this.yDiff = this.yDown - yUp;
+
+        if ( Math.abs( this.xDiff ) > Math.abs( this.yDiff ) ) { // Most significant.
+            if ( this.xDiff > 0 ) {
+                this.onLeft();
+            } else {
+                this.onRight();
+            }
+        } else {
+            if ( this.yDiff > 0 ) {
+                this.onUp();
+            } else {
+                this.onDown();
+            }
+        }
+
+        // Reset values.
+        this.xDown = null;
+        this.yDown = null;
+    }
+
+    run() {
+        this.element.addEventListener('touchmove', function(evt) {
+            this.handleTouchMove(evt).bind(this);
+        }.bind(this), false);
+    }
+}
 
 
 //(function () {
@@ -56,16 +149,10 @@ class Keyboard {
     const RIGHT = 39;
     const input = new Keyboard();
 
-    let tiles = document.getElementsByClassName("tiles")[0];
+    const scores = new Scoreboard();
+    scores.mapDisplay(document.getElementsByClassName("score")[0], document.getElementsByClassName("hi-score")[0])
 
-    input.addMapping(SPACE, keyState => {
-        console.log("keyState", keyState);
-        if (keyState) {
-            console.log("SPACE")//mario.jump.start();
-        } else {
-            console.log("UNSPACE")
-        }
-    });
+    let tiles = document.getElementsByClassName("tiles")[0];
 
     [UP, DOWN, LEFT, RIGHT].forEach(keyName => {
         input.addMapping(keyName, keyState => {
@@ -74,12 +161,23 @@ class Keyboard {
                 console.log(keyName)
                 tileData.collapse(keyName);
             } else {
-                console.log("UNLEFT")
-                //mario.jump.cancel();
+                console.log("key Release")
             }
         });    
     })
     input.listenTo(window);
+
+    var swiper = new Swipe(document.getElementsByClassName("board")[0]);
+    swiper.onUp(function() { tileData.collapse(UP) });
+    swiper.onDown(function() { tileData.collapse(DOWN) });
+    swiper.onLeft(function() { tileData.collapse(LEFT) });
+    swiper.onRight(function() { tileData.collapse(RIGHT) });
+    swiper.run();
+    
+    // One-liner.
+//    (new Swipe('#my-element')).onLeft(function() { alert('You swiped left.') }).run();
+    
+    
 
     const tileData = {
 
@@ -109,10 +207,10 @@ class Keyboard {
             }else{
                 let newTilePosition = Math.round(Math.random()*(zeroCount-1))
                 let j=0;
-                console.log("newTilePosition", newTilePosition)
+//                console.log("newTilePosition", newTilePosition)
                 for (let i=0; i<=newTilePosition; j++){
                     if (this.tileArray[j] == 0) i++;
-                    console.log("i:j",i,j)
+//                    console.log("i:j",i,j)
                 }
                 j--
                 this.tileArray[j] = Math.random() > .5 ? 2 : 4;
@@ -178,19 +276,20 @@ class Keyboard {
                     //newTilePos set each row
                     newMergePos = newTilePos - dir
 
-                    console.log("col:",col, ", merged:",merged)
+//                    console.log("col:",col, ", merged:",merged)
                     if (ta[current] === 0) {                            //If unpopulated cell
                         if (newTilePos === -1) newTilePos = current
                         console.log("blank cell",newTilePos)
 
                     }else{                                              //If populated cell
-                        console.log("dir", dir, ", col", col)
+//                        console.log("dir", dir, ", col", col)
                         if (col === ((dir===1)?0:3)) {                           //If first cell do nothing
                             console.log("first cell")
                         
                         }else if ( !merged && ta[current] === ta[previous] ) {   //If 2 matching tiles ajacent
                             changeTileCol(this.divIndex[current], col, col-dir)
                             ta[previous] *= 2
+                            scores.setScore(ta[previous])
                             ta[current] = 0
                             newTilePos = current;
                             console.log("merge_cell", newTilePos)
@@ -200,6 +299,7 @@ class Keyboard {
                         }else if (!merged && ta[previous] === 0 && (ta[current] === ta[newTilePos-dir]) ) {  //If blank cell before
                             changeTileCol(this.divIndex[current], col, newTilePos%4-dir)
                             ta[newTilePos-dir] *= 2
+                            scores.setScore(ta[newTilePos-dir])
                             ta[current] = 0
                             // newTilePos stays the same
                             console.log("merge_cell_2", newTilePos)
@@ -240,6 +340,7 @@ class Keyboard {
                         }else if ( !merged && ta[current] === ta[previous] ) {   //If 2 matching tiles ajacent
                             changeTileRow(this.divIndex[current], row, row-dir/4)
                             ta[previous] *= 2
+                            scores.setScore(ta[previous])
                             ta[current] = 0
                             newTilePos = current;
                             console.log("merge_cell", newTilePos)
@@ -249,6 +350,7 @@ class Keyboard {
                         }else if (!merged && ta[previous] === 0 && (ta[current] === ta[newTilePos-dir]) ) {  //If blank cell before
                             changeTileRow(this.divIndex[current], row, Math.floor((newTilePos-dir)/4))
                             ta[newTilePos-dir] *= 2
+                            scores.setScore(ta[newTilePos-dir])
                             ta[current] = 0
                             // newTilePos stays the same
                             console.log("merge_cell_2", newTilePos)
