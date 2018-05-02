@@ -167,7 +167,7 @@ class Swipe {
     })
     input.listenTo(window);
 
-    var swiper = new Swipe(document.getElementsByClassName("board")[0]);
+    var swiper = new Swipe(document.getElementsByClassName("game-container")[0]);
     swiper.onUp(function() { tileData.collapse(UP) });
     swiper.onDown(function() { tileData.collapse(DOWN) });
     swiper.onLeft(function() { tileData.collapse(LEFT) });

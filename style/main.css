@@ -1,9 +1,12 @@
+main {
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+}
 
 .game-container {
     position: relative;
     width: 500px;
     height: 540px;
-    font-family: Arial, Helvetica, sans-serif;
     -webkit-touch-callout: none;
     -ms-touch-callout: none;
     -webkit-user-select: none;
@@ -16,11 +19,53 @@
 @media screen and (max-width: 520px) {
     .game-container {
         transform: scale(.5,.5);
+        transform-origin: top left;
     }
 }
 
+.score-container {
+    float: right;
+    text-align: right;
+    width: 400px;
+    height: 50px;
+    padding: 5px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box; 
+}
+  
+
+.score, .hi-score {
+    background: #bbada0;
+    border-radius: 3px;
+    width: 150px;
+    height: 50px;
+    line-height: 44px;
+    text-align: center;
+    position: relative;
+    display: inline-block;
+    padding: 15px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;     
+
+}
+
+.score::before {
+    content: "Score"; 
+    font-size: 18px;
+    position: absolute;
+    text-align: center;
+    top: -10px;
+}  
+
+.hi-score::before {
+    content: "Hi Score"; 
+    font-size: 18px;
+}  
+
 .board {
-    margin-top: 40px;
+    margin-top: 70px;
     position: absolute;
     padding: 15px;
     cursor: default;
@@ -63,7 +108,7 @@
 }
 
 .tiles {
-    margin-top: 40px;
+    margin-top: 70px;
     position: absolute;
     padding: 15px;
     cursor: default;
