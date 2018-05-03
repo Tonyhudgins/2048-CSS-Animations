@@ -52,7 +52,7 @@ main {
 }
 
 .score::before {
-    content: "Score"; 
+    content: "Score "; 
     font-size: 18px;
     position: absolute;
     text-align: center;
@@ -62,6 +62,9 @@ main {
 .hi-score::before {
     content: "Hi Score"; 
     font-size: 18px;
+    position: absolute;
+    text-align: center;
+    top: -10px;
 }  
 
 .board {
@@ -167,7 +170,7 @@ main {
     background: #eee4da;
 }
 .tile-4 {
-    background: #ede0c8;
+    background: #f1dbb4;
 }
 .tile-8 {
     color: #f9f6f2;
@@ -210,6 +213,12 @@ main {
     background: #edc22e;
     font-size: 35px; 
 }
+.tile-4096, .tile-80192 {
+    color: #f9f6f2;
+    background: #544836;
+    font-size: 35px; 
+}
+
 .tile-super {
     color: #f9f6f2;
     background: #3c3a32;

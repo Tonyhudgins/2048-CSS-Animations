@@ -56,13 +56,13 @@ class Scoreboard {
     }
 
     setScore (val) {
-        console.log("setScore", val)
+//        console.log("setScore", val)
         this.score += val;
         this.scoreDisplay.innerHTML = this.score.toString();
     }
 
     setHiScore (val) {
-        console.log("setHiScore", val)
+//        console.log("setHiScore", val)
         this.hiScoreDisplay.innerHTML = val.toString();
     }    
 }
@@ -147,6 +147,7 @@ class Swipe {
     const DOWN  = 40;
     const LEFT  = 37;
     const RIGHT = 39;
+    const H     = 72;
     const input = new Keyboard();
 
     const scores = new Scoreboard();
@@ -156,14 +157,19 @@ class Swipe {
 
     [UP, DOWN, LEFT, RIGHT].forEach(keyName => {
         input.addMapping(keyName, keyState => {
-            console.log("keyState", keyState);
             if (keyState) {
-                console.log(keyName)
                 tileData.collapse(keyName);
             } else {
-                console.log("key Release")
+//                console.log("key Release")
             }
         });    
+    })
+    input.addMapping(H, keyState => {
+        if (keyState) {
+            tileData.tileArray = tileData.tileHistory.pop();
+            tiles.innerHTML = tileData.serialize();
+            console.log("history");
+        }
     })
     input.listenTo(window);
 
@@ -187,6 +193,32 @@ class Swipe {
             0,0,0,0,
             0,0,0,0
         ],
+/*
+        tileArray: [
+//            512, 2, 4, 4, 
+            0,0,0,0,
+            256, 4, 8, 2, 
+            0, 2, 0, 0, 
+            0, 0, 0, 0
+        ],
+
+        tileArray: [
+//            4,16,2,8,
+//            256,4,16,4,
+            0,0,0,0,
+            0,0,0,0,
+            0,0,4,0,
+            4,2,8,4
+        ],
+
+        tileArray: [
+            128,2,128,16,
+            32,256,8,0,
+            4,16,32,4,
+            4,0,0,0
+        ],
+*/
+        tileHistory: [],
 
         divIndex: [],
 
@@ -247,7 +279,16 @@ class Swipe {
                 t.classList.add(`tile-row${to}`)
             }
 
+            const findRow = function (val) {
+                return Math.floor(val/4)
+            }
+
+            const findCol = function (val) {
+                return val%4
+            }
+
             setTimeout(()=>{
+                this.tileHistory.push([...this.tileArray]);
                 let tileDisplayArray = tiles.getElementsByClassName("tile");
                 let n=-1;
                 this.divIndex = this.tileArray.map(c => {
@@ -277,6 +318,8 @@ class Swipe {
                     newMergePos = newTilePos - dir
 
 //                    console.log("col:",col, ", merged:",merged)
+//                            console.log("col", col, "row", row)
+
                     if (ta[current] === 0) {                            //If unpopulated cell
                         if (newTilePos === -1) newTilePos = current
                         console.log("blank cell",newTilePos)
@@ -296,7 +339,12 @@ class Swipe {
                             merged = true;
                             moved = true;
 
-                        }else if (!merged && ta[previous] === 0 && (ta[current] === ta[newTilePos-dir]) ) {  //If blank cell before
+                        }else if (
+                            !merged && 
+                            ta[previous] === 0 && 
+                            (ta[current] === ta[newTilePos-dir]) && 
+                            findRow(current) === findRow(newTilePos-dir) 
+                        ) {  //If blank cell before
                             changeTileCol(this.divIndex[current], col, newTilePos%4-dir)
                             ta[newTilePos-dir] *= 2
                             scores.setScore(ta[newTilePos-dir])
@@ -327,13 +375,13 @@ class Swipe {
                     //newTilePos set each row
                     newMergePos = newTilePos - dir
 
-                    console.log("row:",row, ", merged:",merged)
+//                    console.log("row:",row, ", merged:",merged)
                     if (ta[current] === 0) {                            //If unpopulated cell
                         if (newTilePos === -1) newTilePos = current
                         console.log("blank cell",newTilePos)
 
                     }else{                                              //If populated cell
-                        console.log("dir", dir, ", row", row)
+//                        console.log("dir", dir, ", row", row)
                         if (row === ((dir>0)?0:3)) {                           //If first cell do nothing
                             console.log("first cell")
                         
@@ -347,8 +395,13 @@ class Swipe {
                             merged = true;
                             moved = true;
 
-                        }else if (!merged && ta[previous] === 0 && (ta[current] === ta[newTilePos-dir]) ) {  //If blank cell before
-                            changeTileRow(this.divIndex[current], row, Math.floor((newTilePos-dir)/4))
+                        }else if (
+                            !merged && 
+                            ta[previous] === 0 && 
+                            ta[current] === ta[newTilePos-dir] && 
+                            findCol(current) === findCol(newTilePos-dir)
+                        ) {  //If blank cell before
+                            changeTileRow(this.divIndex[current], row, findRow(newTilePos-dir))
                             ta[newTilePos-dir] *= 2
                             scores.setScore(ta[newTilePos-dir])
                             ta[current] = 0
@@ -359,7 +412,7 @@ class Swipe {
 
                         }else if (newTilePos > -1) {                    //If blank cell before
                             console.log("move cell", newTilePos)
-                            changeTileRow(this.divIndex[current], row, Math.floor((newTilePos)/4))
+                            changeTileRow(this.divIndex[current], row, findRow(newTilePos))
                             ta[newTilePos] = ta[current]
                             ta[current] = 0
                             newTilePos = newTilePos + dir;
