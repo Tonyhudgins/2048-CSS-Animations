@@ -59,11 +59,12 @@ class Scoreboard {
 //        console.log("setScore", val)
         this.score += val;
         this.scoreDisplay.innerHTML = this.score.toString();
+        this.hiScoreDisplay.innerHTML = this.score.toString();
     }
 
     setHiScore (val) {
 //        console.log("setHiScore", val)
-        this.hiScoreDisplay.innerHTML = val.toString();
+        this.hiScoreDisplay.innerHTML = this.hiScore.toString();;
     }    
 }
 
