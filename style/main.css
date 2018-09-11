@@ -4,7 +4,8 @@ main {
 }
 
 .game-container {
-    position: relative;
+    position: absolute;
+    margin-top: 70px;
     width: 500px;
     height: 540px;
     -webkit-touch-callout: none;
@@ -18,7 +19,7 @@ main {
 }
 @media screen and (max-width: 520px) {
     .game-container {
-        transform: scale(.5,.5);
+        transform: scale(.7,.7);
         transform-origin: top left;
     }
 }
@@ -74,7 +75,6 @@ main {
 }  
 
 .board {
-    margin-top: 70px;
     position: absolute;
     padding: 15px;
     cursor: default;
@@ -117,7 +117,6 @@ main {
 }
 
 .tiles {
-    margin-top: 70px;
     position: absolute;
     padding: 15px;
     cursor: default;
@@ -230,3 +229,42 @@ main {
     background: #3c3a32;
     font-size: 30px; 
 }
+
+.game-controls {
+    float: right;
+    text-align: right;
+    height: 50px;
+    padding: 5px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box; 
+}
+  
+
+.history {
+    background: #bbada0;
+    border-radius: 3px;
+    width: 150px;
+    height: 50px;
+    line-height: 40px;
+    font-size: 24px;
+    text-align: center;
+    position: relative;
+    display: inline-block;
+    padding: 15px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;     
+
+}
+
+.nhistory::before {
+    content: "Score "; 
+    font-size: 14px;
+    color: white;
+    position: absolute;
+    text-align: center;
+    top: -10px;
+    left: 0px;
+    width: 100%;
+}  

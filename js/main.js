@@ -167,8 +167,7 @@ class Swipe {
     })
     input.addMapping(H, keyState => {
         if (keyState) {
-            tileData.tileArray = tileData.tileHistory.pop();
-            tiles.innerHTML = tileData.serialize();
+            tileData.revert();
             console.log("history");
         }
     })
@@ -483,6 +482,12 @@ class Swipe {
                 }
 
             },200) //delay to allow the DOM to render
+        },
+
+        revert: function () {
+            this.tileArray = this.tileHistory.pop();
+            tiles.innerHTML = this.serialize();
+            console.log("history");
         }
     } 
 
